@@ -1,55 +1,46 @@
+// adding the dependencies for the functions required to execute "fs", "axios" & "inquirer"
+
 const fs = require("fs");
 const axios = require("axios");
 const inquirer = require("inquirer");
 
+// requiring the file generateMarkdown to call the file structure function
 var markdown = require("./utils/generateMarkdown.js");
-// var markdown = require('./utils/generateMarkdown.js');
+const generateMarkdown = require("./utils/generateMarkdown.js");
 
+// Starting inquirer to get prompts in the terminal to get GitHub user and project name
 inquirer
-    .prompt ([
-        {
-        type: "input",
-        message: "Enter your GitHub username",
-        name: "github"
-        },
-        {
-        type: "input",
-        message: "Enter your Repository name",
-        name: "repoName"    
+  .prompt([
+    {
+      type: "input",
+      message: "Enter your GitHub username",
+      name: "github",
+    },
+    {
+      type: "input",
+      message: "Enter your Repository name",
+      name: "repoName",
+    },
+  ])
+  .then(function (response) {
+    const queryUrl = `https://api.github.com/repos/${response.github}/${response.repoName}`;
+
+    axios.get(queryUrl).then(function (res) {
+      const repoNames = res.data;
+      fs.writeFile("README.md", generateMarkdown(repoNames), function (err) {
+        if (err) {
+          throw err;
         }
 
-    ])
-    .then(function(response) {
-        const queryUrl = `https://api.github.com/repos/${response.github}/${response.repoName}`;
-    
-        axios.get(queryUrl).then(function(res) {
-        //   const repoNames = res.data
-        //     console.log(repoNames);
-            const repoNames = res.data;
-            const repoNamesStr = JSON.stringify(repoNames)
-              const repoNamesArr = repoNamesStr.split(",")
-              const repoNamesString = repoNamesArr.join("\n");
-              //console.log(markdown.generateMarkdown(repoNames));
-          fs.writeFile("README.md", repoNamesString, function(err) {
-            if (err) {
-              throw err;
-            }
-    
-            console.log(`Saved ${repoNames.length} repos`);
-          });
-        });
+        console.log(`README file genrated succesfully!`);
       });
+    });
+  });
 
+const questions = [];
 
-const questions = [
+function writeToFile(fileName, data) {}
 
-];
-
-function writeToFile(fileName, data) {
-}
-
-function init() {
-
-}
+function init() {}
 
 init();
